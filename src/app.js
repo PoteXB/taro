@@ -2,13 +2,17 @@ import {Component} from 'react'
 import Taro from "@tarojs/taro";
 import './app.scss'
 class App extends Component {
-  errorTips = null
+  onLaunch() {
+    Taro.$systemInfo = Taro.getSystemInfoSync()
+    if (process.env.TARO_ENV === 'weapp') {
+      Taro.$menuButtonBoundingClientRect = Taro.getMenuButtonBoundingClientRect()
+    } else {
+      Taro.$menuButtonBoundingClientRect = {}
+    }
+  }
   componentDidMount() {
-    Taro.eventCenter.on('changeErrorTips',(v) => {
-      this.errorTips = v.refs.loading;
-    })
-    Taro.eventCenter.on('openErrorTips',(v) => {
-      this.errorTips.addError(v)
+    Taro.eventCenter.on('changeNavBar',(v) => {
+      Taro.$navBar(v)
     })
   }
   componentDidShow() {}

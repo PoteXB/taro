@@ -4,6 +4,9 @@ import {pageToLogin} from "./utils"
 import {HTTP_STATUS} from './config'
 let count = {};//计数器
 let allErrorMsg = {};
+Taro.eventCenter.on('openErrorTips',(v) => {
+  Taro.$errorTips.addError(v)
+})
 function jieLiu(errorMsg,callBack) {
   if (!allErrorMsg[errorMsg]) {
     allErrorMsg[errorMsg] = 1;

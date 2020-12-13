@@ -18,7 +18,7 @@ export default (WrappedComponent) => {
       if (super.componentDidShow) {
         super.componentDidShow()
       }
-      Taro.eventCenter.trigger('changeErrorTips',this)
+      Taro.$errorTips = this.refs.loading;
     }
     render() {
       return <>

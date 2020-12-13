@@ -3,10 +3,12 @@ import Taro from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import hocErrorTips from "@/components/HOC/hocErrorTips";
 import hocShare from "@/components/HOC/hocShare";
+import hocNavBar from "@/components/HOC/hocNavBar/index";
 import css from './index.module.scss'
 import API from '@/API/home'
-@hocShare()
 @hocErrorTips
+@hocShare()
+@hocNavBar({title:'首页'})
 class Index extends Component {
   componentWillMount() {}
   componentDidMount() {
@@ -16,6 +18,7 @@ class Index extends Component {
   componentWillUnmount() {}
   componentDidHide() {}
   aaa() {
+    Taro.eventCenter.trigger('changeNavBar',{title:'修改后的首页'})
     Taro.navigateTo({
       url:'/pages/home/index'
     })
