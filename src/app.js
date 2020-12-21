@@ -11,9 +11,6 @@ class App extends Component {
     }
   }
   componentDidMount() {
-    Taro.eventCenter.on('changeNavBar',(v) => {
-      Taro.$navBar(v)
-    })
   }
   componentDidShow() {}
   componentDidHide() {}

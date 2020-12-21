@@ -1,22 +1,18 @@
 import React,{Component} from 'react'
 import {View} from '@tarojs/components'
-import hocErrorTips from "@/components/HOC/hocErrorTips";
-import hocShare from "@/components/HOC/hocShare";
+import hocCommon from "@/components/HOC/common";
 import css from './index.module.scss'
 import API from '@/API/home'
-@hocShare({})
-@hocErrorTips
+@hocCommon({title:'第二页标题'})
 class Home extends Component {
-  componentWillMount() { }
   componentDidMount() {
     API.getHome({keywords:1})
   }
-  componentWillUnmount() { }
-  componentDidShow() { }
-  componentDidHide() { }
+  bbb = () => {
+  }
   render() {
     return (
-      <View className={css.main}>第二页</View>
+      <View className={css.main} onClick={this.bbb}>第二页</View>
     )
   }
 }
