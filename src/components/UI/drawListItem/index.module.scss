@@ -1,0 +1,29 @@
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 144px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  .box {
+    height: 100%;
+    .text {
+      margin-top: 30px;
+      height: 40px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #4C4C4C;
+      line-height: 40px;
+    }
+    .time {
+      margin-top: 10px;
+      height: 34px;
+      font-size: 24px;
+      color: #4C4C4C;
+      line-height: 34px;
+    }
+  }
+  .arrow {
+    width: 28px;
+    height: 28px;
+  }
+}

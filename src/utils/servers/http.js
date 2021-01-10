@@ -19,37 +19,71 @@ function jieLiu(errorMsg,callBack) {
 const customInterceptor = (chain) => {
   let requestParams = chain.requestParams
   requestParams.nowNum = new Date().getTime();
-  if (requestParams.data._noLoad) {
-    delete requestParams.data._noLoad
+  //参数里带这个请求是否是下拉刷新需要结束下拉刷新
+  if (requestParams.data.pullDownRefresh) {
+    delete requestParams.data.pullDownRefresh
+    requestParams.pullDownRefresh = true;
+  }
+  //参数里带这个请求是否不需要load
+  if (requestParams.data.noLoading) {
+    delete requestParams.data.noLoading
     count[requestParams.nowNum] = true
   } else {
     count[requestParams.nowNum] = true
-    Taro.showLoading({mask:true})
+    Taro.showLoading({mask:true,title:'加载中'})
   }
   return chain.proceed(requestParams).then(res => {
     count[requestParams.nowNum] = undefined
     if (JSON.stringify(count) === "{}") {
       Taro.hideLoading()
     }
-    if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
-      return Promise.reject("请求资源不存在")
-    } else if (res.statusCode === HTTP_STATUS.BAD_GATEWAY) {
-      return Promise.reject("服务端出现了问题")
-    } else if (res.statusCode === HTTP_STATUS.FORBIDDEN) {
-      Taro.setStorageSync("Authorization","")
-      pageToLogin()
-      return Promise.reject("没有权限访问");
-    } else if (res.statusCode === HTTP_STATUS.AUTHENTICATE) {
-      Taro.setStorageSync("Authorization","")
-      pageToLogin()
-      return Promise.reject("需要鉴权")
-    } else if (res.statusCode === HTTP_STATUS.SUCCESS) {
-      return res.data
+    if (requestParams.pullDownRefresh) {
+      Taro.stopPullDownRefresh()
     }
-  }).catch(() => {
+    let msg = '请求异常';
+    if (res.statusCode === HTTP_STATUS.SUCCESS) {
+      if (res.data.code === 200) {
+        return res.data
+      } else {
+        res.data.message && (msg = res.data.message)
+      }
+    }
+    if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
+      msg = '404'
+    } else if (res.statusCode === HTTP_STATUS.BAD_GATEWAY) {
+      msg = '502'
+    } else if (res.statusCode === HTTP_STATUS.FORBIDDEN) {
+      Taro.setStorageSync("token","")
+      msg = '403'
+    } else if (res.statusCode === HTTP_STATUS.AUTHENTICATE) {
+      Taro.setStorageSync("token","")
+      msg = '401'
+    }
+    if (msg) {
+      jieLiu(msg,() => {
+        Taro.eventCenter.trigger('openErrorTips',msg)
+      });
+      return Promise.reject({type:'self',msg});
+    }
+  }).catch((res) => {
+    if (typeof res === 'object' && res.type === 'self') {
+      if (res.msg === '登录状态失效,请重新登录') {
+        Taro.removeStorageSync("token")
+        Taro.removeStorageSync("userInfo")
+        setTimeout((v) => {
+          Taro.navigateTo({
+            url:`/pages/index/index`
+          })
+        },1500)
+      }
+      return Promise.reject(res.msg);
+    }
     count[requestParams.nowNum] = undefined
     if (JSON.stringify(count) === "{}") {
       Taro.hideLoading()
+    }
+    if (requestParams.pullDownRefresh) {
+      Taro.stopPullDownRefresh()
     }
     let msg = '网络异常';
     jieLiu(msg,() => {
@@ -69,8 +103,8 @@ class httpRequest {
       data:data,
       method:method,
       header:{
-        // 'content-type':contentType,
-        // 'Authorization':Taro.getStorageSync('Authorization')
+        'content-type':contentType,
+        'KH-Token':Taro.getStorageSync('token')
       }
     };
     return Taro.request(option);

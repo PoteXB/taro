@@ -1,0 +1,26 @@
+.popup-layer {
+  position: fixed;
+  z-index: 1999;
+  background: rgba(0, 0, 0, .3);
+  transition: opacity .3s ease;
+  opacity: 0;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  overflow: hidden;
+}
+.popup-content {
+  border-radius: 10px 10px 0 0;
+  position: fixed;
+  z-index: 2000;
+  background: #FFFFFF;
+  transition: transform .3s ease;
+  overflow: hidden;
+}
+.popup-close {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  right: 20px;
+  top: 20px;
+}

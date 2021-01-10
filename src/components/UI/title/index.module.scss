@@ -1,0 +1,29 @@
+.main {
+  display: flex;
+  align-items: center;
+  .icon {
+    width: 8px;
+    height: 24px;
+    background: linear-gradient(180deg, #FF8888 0%, #FE393A 100%);
+    margin-right: 16px;
+  }
+  .text {
+    height: 40px;
+    font-size: 28px;
+    color: #1A1A1A;
+    line-height: 40px;
+  }
+}
+.main.big {
+  .icon {
+    width: 10px;
+    height: 30px;
+    border-radius: 2px;
+  }
+  .text {
+    height: 50px;
+    font-size: 36px;
+    color: #000000;
+    line-height: 50px;
+  }
+}

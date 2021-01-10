@@ -1,17 +1,15 @@
 .box {
   position: fixed;
-  top: 16px;
   left: 0;
   width: 100%;
+  z-index:3000;
 }
-
 .item {
-  padding: 16px;
+  padding: 16px 16px 0 16px;
   height: 84px;
   text-align: center;
   display: flex;
   justify-content: center;
-
   .itemT {
     display: inline-block;
     height: 44px;
@@ -19,16 +17,14 @@
     padding: 20px 32px;
     background: #fff;
     border-radius: 4px;
-    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, .12), 0 6px 16px 0 rgba(0, 0, 0, .08), 0 9px 28px 8px rgba(0, 0, 0, .05);
+    box-shadow: 0 6px 12px -8px rgba(0, 0, 0, .12), 0 12px 32px 0 rgba(0, 0, 0, .08), 0 18px 56px 16px rgba(0, 0, 0, .05);
     font-size: 12PX;
   }
-
   opacity: 0;
   animation: show 3s;
   animation-timing-function: ease;
   color: rgba(0, 0, 0, .85);
 }
-
 @keyframes show {
   0% {
     opacity: 0;

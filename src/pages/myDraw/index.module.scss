@@ -1,0 +1,54 @@
+.main {
+  padding: 10px 36px 20px 36px;
+  .tab {
+    display: flex;
+    .item {
+      width: 50%;
+      height: 60px;
+      text-align: center;
+      font-size: 32px;
+      color: #4C4C4C;
+      position: relative;
+      .text {
+        height: 44px;
+        line-height: 44px;
+      }
+      .underLine {
+        width: 60px;
+        height: 6px;
+        background: linear-gradient(270deg, #FF8888 0%, #FE393A 100%);
+        border-radius: 5px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        margin-left: -30px;
+        display: none;
+      }
+    }
+    .item.active {
+      color: #1A1A1A;
+      .underLine {
+        display: block;
+      }
+    }
+  }
+  .row {
+    height: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    margin: 0 -36px;
+  }
+  .noList {
+    display: block;
+    margin: 170px auto 0 auto;
+    width: 400px;
+    height: 400px;
+  }
+  .noListText {
+    margin-top: 18px;
+    text-align: center;
+    height: 40px;
+    font-size: 28px;
+    color: #B1B1B1;
+    line-height: 40px;
+  }
+}

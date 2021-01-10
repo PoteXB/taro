@@ -8,8 +8,11 @@
       "@/components/*": [
         "./src/components/*"
       ],
+      "@/img/*": [
+        "./src/assets/img/*"
+      ],
       "@/API/*": [
-        "./src/utils/servers/api/*"
+        "./src/utils/servers/*"
       ]
     }
   }

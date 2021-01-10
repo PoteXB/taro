@@ -1,7 +1,83 @@
 .navBarMain {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: #FFF;
+  width: 100%;
+  z-index: 1000;
   .navBarTitle {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    .leftIconBox {
+      position: absolute;
+      left: 36px;
+      width: 60px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      .head {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #0e73e8;
+      }
+      .back {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+}
+.login {
+  width: 550px;
+  height: 546px;
+  background: #FEFEFE;
+  border-radius: 10px;
+  text-align: center;
+  padding-top: 90px;
+  box-sizing: border-box;
+  position: relative;
+  .icon {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    top: -70px;
+    left: 205px;
+  }
+  .p1 {
+    height: 50px;
+    font-size: 36px;
+    font-weight: 700;
+    color: #1A1A1A;
+    line-height: 50px;
+  }
+  .p2 {
+    height: 34px;
+    font-size: 24px;
+    color: #4C4C4C;
+    margin-top: 20px;
+  }
+  .p3, .p4 {
+    border: none;
+    margin: 0 auto;
+    padding: 0;
+    width: 410px;
+    height: 86px;
+    border-radius: 10px;
+    font-size: 28px;
+    line-height: 86px;
+  }
+  .p3 {
+    margin-top: 90px;
+    background: #FF3A3A;
+    color: #FFFFFF;
+  }
+  .p4 {
+    background: rgba(0, 0, 0, 0.08);
+    color: #4C4C4C;
+    margin-top: 30px;
   }
 }

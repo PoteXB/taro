@@ -17,7 +17,8 @@ const config = {
   alias:{
     '@/utils':path.resolve(__dirname,'..','src/utils'),
     '@/components':path.resolve(__dirname,'..','src/components'),
-    '@/API':path.resolve(__dirname,'..','src/utils/servers/api'),
+    '@/API':path.resolve(__dirname,'..','src/utils/servers'),
+    '@/img':path.resolve(__dirname,'..','src/assets/img'),
   },
   copy:{
     patterns:[],

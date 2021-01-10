@@ -25,8 +25,8 @@ export default class Loading extends Component {
   }
   render() {
     return (
-      <View className={css.box}>
-        {this.state.errorList.map((v,k) => {
+      <View className={css.box} style={{top:this.props.navBarStyle.height}}>
+        {this.state.errorList.map((v) => {
           return <View key={v.key} className={css.item}>
             <View className={css.itemT}>{v.title}</View>
           </View>

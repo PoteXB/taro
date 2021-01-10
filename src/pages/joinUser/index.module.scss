@@ -1,0 +1,35 @@
+.main {
+  .head {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    height: 34px;
+    font-size: 24px;
+    color: #1A1A1A;
+    line-height: 34px;
+  }
+  .list {
+    padding: 0 36px;
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    justify-content: space-between;
+    .kong {
+      width: 80px;
+      height: 0;
+    }
+  }
+  .item {
+    width: 80px;
+    height: 80px;
+    background: #B8B8B8;
+    border-radius: 10px;
+    margin-bottom: 40px;
+  }
+  .loadMore {
+    text-align: center;
+    height: 34px;
+    font-size: 24px;
+    color: #0056BA;
+    line-height: 34px;
+  }
+}
