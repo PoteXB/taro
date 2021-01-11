@@ -37,32 +37,29 @@ class Index extends Component {
   end = false
   isLogin = this.props.isLogin
   state = {
-    mainInfo:{}, //第一条主要信息
-    mainStatus:1, //1初始态可参加  2已结束未中奖  3参与中 4中奖 5已结束未参加
-    fuLiInfo:{},
+    mainInfo:{}, //第一条主要信息 //1初始态可参加  2已结束未中奖  3参与中 4中奖 5已结束未参加
     scrollIndex:0,
     list:[],
     modalImg:''
   }
   componentDidMount() {
     let rewardId = Taro.getCurrentInstance().router.params.id
-    API.rewardFindDetails({rewardId}).then((v) => {
-      let {isEnd,isJoin,isPrize,isReward,reward,nextReward,rewardUserList,prizeList} = v.result
-      let status = this.returnStatus(isEnd,isJoin,isPrize,isReward)
+    let result = []
+    //首次首页详情
+    this.getInfoById(rewardId,(data) => {
+      let {status,reward,nextReward,rewardUserList,prizeList} = data
       let mainStatus = status
-      let result = []
       if (reward) {
+        reward.lock = true
         reward.status = status
-        reward.joinArr = rewardUserList
-        reward.prizeList = prizeList || []
+        reward.rewardUserList = rewardUserList
+        reward.prizeList = prizeList
+        reward.nextReward = nextReward
         result.push(reward)
       }
       let mainInfo = reward
-      if (nextReward) {
-        nextReward.status = 1
-        nextReward.joinArr = []
-        nextReward.prizeList = []
-        // result.push(nextReward)
+      if (nextReward.id) {
+        result.push(nextReward)
       }
       result = result.map((x) => {
         return {
@@ -76,34 +73,48 @@ class Index extends Component {
         }
       })
       let list = this.state.list.concat(result);
-      this.setState({list,mainStatus,mainInfo,fuLiInfo:nextReward || {}},() => {
-        if (this.state.mainStatus === 4 || this.state.mainStatus === 2) {
+      this.setState({list,mainInfo},() => {
+        if (mainStatus === 4 || mainStatus === 2) {
           this.popupDom.show()
         }
       })
     })
   }
-  componentDidUpdate() {
+  componentDidUpdate(a,b,c) {
     if (this.isLogin !== this.props.isLogin) {
       this.isLogin = this.props.isLogin
-      this.getInfoById()
+      this.restNowInfo()
     }
   }
-  getInfoById(callBack) {
-    let {scrollIndex,list} = this.state
-    let rewardId = list[scrollIndex].id
+  getInfoById(rewardId,callBack) {
     API.rewardFindDetails({rewardId}).then((v) => {
       let {isEnd,isJoin,isPrize,isReward,reward,nextReward,rewardUserList,prizeList} = v.result
       let status = this.returnStatus(isEnd,isJoin,isPrize,isReward)
+      callBack({
+        status,
+        reward,
+        rewardUserList:rewardUserList || [],
+        prizeList:prizeList || [],
+        nextReward:nextReward || {},
+      })
+    })
+  }
+  restNowInfo(obj = {}) {
+    let {scrollIndex,list} = this.state
+    let rewardId = list[scrollIndex].id
+    this.getInfoById(rewardId,(data) => {
+      let {status,reward,nextReward,rewardUserList,prizeList} = data
       this.state.list[scrollIndex] = {
         ...list[scrollIndex],
-        status,
-        joinArr:rewardUserList,
+        ...reward,
+        status:status,
+        rewardUserList:rewardUserList,
         prizeList:prizeList,
+        nextReward:nextReward,
       }
       this.setState({})
-      if (callBack) {
-        callBack()
+      if (obj.callBack) {
+        obj.callBack(data)
       }
     })
   }
@@ -142,8 +153,29 @@ class Index extends Component {
     })
   }
   onChange = () => {
-    if (this.state.list.length === this.state.scrollIndex + 1) {
+    let {scrollIndex,list} = this.state
+    if (!list[scrollIndex].lock) {
       if (!this.end) {
+        this.restNowInfo({
+          callBack:(data) => {
+            list[scrollIndex].lock = true
+            if (data.nextReward.id) {
+              let {list} = this.state
+              list.push({
+                ...data.nextReward,
+                selectTab:0,
+                scrollData:{
+                  scrollTop:0,
+                  allHeight:0,
+                  boxHeight:0,
+                }
+              })
+              this.setState({
+                list
+              })
+            }
+          }
+        })
         // this.getList()
       }
     }
@@ -164,18 +196,18 @@ class Index extends Component {
         Taro.requestSubscribeMessage({
           tmplIds:['wi-uGtvC2wLlznxCOwso9OGbTsZJOB1i5T-5g0IdLTY'],
           success:function (res) {
-            console.log(res)
           },
           fail:function (res) {
-            console.log(res)
           },
-          complete:function (res) {
-            that.getInfoById(() => {
-              Taro.showToast({
-                title:'参与成功',
-                icon:'success',
-                duration:2000
-              })
+          complete:function () {
+            that.restNowInfo({
+              callBack:() => {
+                Taro.showToast({
+                  title:'参与成功',
+                  icon:'success',
+                  duration:2000
+                })
+              }
             })
           },
         })
@@ -183,8 +215,8 @@ class Index extends Component {
     }
     // this.modalTipDom.show()
   }
-  fuLiInfoDom(title) {
-    let {fuLiInfo} = this.state
+  fuLiInfoDom(title,v) {
+    let fuLiInfo = v.nextReward || {}
     return (fuLiInfo.id && <>
       <Title>{title}</Title>
       <Place height={30}/>
@@ -193,14 +225,15 @@ class Index extends Component {
   }
   winListDom(v,noBorder) {
     let style = noBorder ? {border:'none',paddingBottom:0,marginBottom:'20rpx'} : {}
-    return <>
+    let prizeList = v.prizeList || []
+    return !!prizeList.length && <>
       <Title>中奖者名单</Title>
       <Place height={30}/>
       <View className={css.winList} style={style}>
         {this.kongArr.map(() => {
           return <View className={css.kong}/>
         })}
-        {(v.prizeList || []).map((x,k) => {
+        {prizeList.map((x,k) => {
           return <View className={css.item} key={k}>
             <Image src={x.faceImg}/>
             <View className={css.text}>{x.nickName}</View>
@@ -223,13 +256,13 @@ class Index extends Component {
   }
   joinNumDom(v) {
     return <View className={css.joinNum} onClick={() => {this.toJoinUser(v.id)}}>
-      已有{(v.joinArr || []).length}人参与，查看全部
+      已有{(v.rewardUserList || []).length}人参与，查看全部
       <Image className={css.icon} src={img3}/>
     </View>
   }
-  joinIconDom(joinArr) {
+  joinIconDom(rewardUserList) {
     return <View className={css.joinIcon}>
-      {(joinArr || []).map((v,k) => {
+      {(rewardUserList || []).map((v,k) => {
         return <Image className={css.img} src={v.faceImg} key={k}/>
       })}
     </View>
@@ -254,7 +287,7 @@ class Index extends Component {
   }
   tabContDom(v) {
     let {selectTab} = v
-    let {explainArr} = this
+    // let {explainArr} = this
     return <>
       {selectTab === 0 ? <View className={css.explain}>
         {/*{explainArr.map((v,k) => {*/}
@@ -271,8 +304,9 @@ class Index extends Component {
       {selectTab === 1 ? <Image className={css.redImg} src={v.redImg}/> : null}
     </>
   }
-  divisionDom(status) {
+  divisionDom(v) {
     let {divisionObj} = this
+    let {status} = v
     return <View className={css.division}>
       <View className={`${css.line} ${css[`line${status}`]}`}/>
       <View className={css[`text${status}`]}>{divisionObj[status]}</View>
@@ -280,12 +314,12 @@ class Index extends Component {
     </View>
   }
   render() {
-    let {mainStatus,scrollIndex,list,modalImg,mainInfo} = this.state
+    let {scrollIndex,list,modalImg,mainInfo} = this.state
+    let mainStatus = mainInfo.status
     console.log('当前页数',scrollIndex + 1)
     console.log('总页数' + list.length)
     console.log('数据',this)
-    let fuLiInfoDom = this.fuLiInfoDom('为你准备了如下福利')
-    let moreFuLiInfoDom = this.fuLiInfoDom('更多抽奖')
+    let moreFuLiInfoDom = this.fuLiInfoDom('更多抽奖',mainInfo)
     let winListPopDom = this.winListDom(mainInfo,true)
     let {screenHeight} = Taro.$systemInfo
     let scrollHeight = this.props.mainStyle.height
@@ -329,13 +363,14 @@ class Index extends Component {
             let status4 = status === 4;
             let status5 = status === 5;
             let isRender = [scrollIndex - 1,scrollIndex,scrollIndex + 1].includes(k)
-            let joinIcon = this.joinIconDom(v.joinArr)
+            let joinIcon = this.joinIconDom(v.rewardUserList)
             let joinNum = this.joinNumDom(v)
             let tab = this.tabDom(v)
             let tabCont = this.tabContDom(v)
-            let division = this.divisionDom(v.status)
+            let division = this.divisionDom(v)
             let join = this.joinDom(v)
             let winListDom = this.winListDom(v)
+            let fuLiInfoDom = this.fuLiInfoDom('为你准备了如下福利',v)
             return isRender ? <>
               <ScrollView
                 key={v.id}
